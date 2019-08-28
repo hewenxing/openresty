@@ -1,0 +1,73 @@
+yum安装openresty
+yum install pcre-devel openssl-devel gcc curl
+sudo yum install yum-utils
+sudo yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
+sudo yum -y install openresty
+如果想安装命令行工具 resty
+sudo yum -y install openresty-resty
+列出所有 openresty 仓库里头的软件包
+sudo yum --disablerepo="*" --enablerepo="openresty" list available
+
+vim /etc/nginx/nginx.conf
+#user  nobody;
+worker_processes  1;
+
+#pid        logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+   
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        location / {
+            default_type text/html;
+            content_by_lua '
+                ngx.say("<p>hello, world</p>")
+            ';
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+      
+    }
+
+}
+
+启动openresty
+/usr/local/openresty/nginx/sbin/nginx
+停止openresty
+/usr/local/openresty/nginx/sbin/nginx -s stop
+检查正确
+/usr/local/openresty/nginx/sbin/nginx -t
+ps -ef | grep nginx
